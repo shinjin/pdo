@@ -1,0 +1,38 @@
+language: php
+
+php:
+  - 5.6
+  - 7.0
+  - hhvm
+  - nightly
+
+env:
+  - DB=mysql
+  - DB=pgsql
+  - DB=sqlite
+
+services:
+  - mysql
+  - postgresql
+
+install:
+  - composer require phpunit/dbunit:^2.0
+
+before_script:
+  - mysql -uroot -e "create database IF NOT EXISTS dbtest;"
+  - psql -c 'create database dbtest;' -U postgres
+
+script:
+  - DB=$DB ./vendor/bin/phpunit --coverage-text
+
+after_success:
+  - travis_retry php vendor/bin/php-coveralls
+
+matrix:
+  exclude:
+    - php: hhvm
+      env: DB=pgsql
+  allow_failures:
+    - php: nightly
+
+sudo: false

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         syntaxCheck="false"
+>
+    <testsuites>
+        <testsuite name="Pdo Test Suite">
+            <directory>tests/</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory>./src</directory>
+            <exclude>
+              <directory>./src/Exception</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
+    <php>
+        <env name="DB" value="mysql"/>
+        <var name="db.mysql.dbname" value="dbtest" />
+        <var name="db.mysql.host" value="localhost" />
+        <var name="db.mysql.port" value="3306" />
+        <var name="db.mysql.user" value="root" />
+        <var name="db.mysql.password" value="" />
+        <var name="db.pgsql.dbname" value="dbtest" />
+        <var name="db.pgsql.host" value="localhost" />
+        <var name="db.pgsql.port" value="5432" />
+        <var name="db.pgsql.user" value="postgres" />
+        <var name="db.pgsql.password" value="" />
+        <var name="db.sqlite.dsn" value="sqlite::memory:" />
+        <var name="db.sqlite.user" value="" />
+        <var name="db.sqlite.password" value="" />
+    </php>
+</phpunit>
