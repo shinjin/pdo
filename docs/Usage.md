@@ -18,9 +18,9 @@ $db = new Db($connection_parameters);
 The parameter list can also specify the PDO DSN connection string, in which case, parameters like dbname, host, and port are ignored.
 ``` php
 $connection_parameters = array(
-    'driver'   => 'sqlite',
-    'dsn'      => 'sqlite::memory:',
-    'dbname'   => 'dbtest' // ignored
+    'driver' => 'sqlite',
+    'dsn'    => 'sqlite::memory:',
+    'dbname' => 'dbtest' // ignored
 );
 
 $db = new Db($connection_parameters);
@@ -33,7 +33,7 @@ $parameters = array(1);
 
 $sth = $db->query($statement, $parameters);
 
-// Apply any PDOStatement method to extract the results
+// apply any PDOStatement method to extract the results
 $result = $sth->fetchAll();
 ```
 
@@ -166,6 +166,7 @@ foreach($param_sets as $params) {
     $statement = $db->query($statement, $params);
     // $statement is now a pdo statement object
 }
+
 // pdo prepare is called on the first iteration only
 ```
 
@@ -178,7 +179,7 @@ $db->errorInfo();
 $db->exec($statement);
 etc.
 
-// These will all work.
+// these will all work
 ```
 ## Transactions
 Nested transactions will work as expected (unlike the PDO methods).

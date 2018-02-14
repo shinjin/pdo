@@ -1,5 +1,7 @@
 <?php
-namespace Shinjin\Pdo;
+namespace Shinjin\Pdo\Tests;
+
+use Shinjin\Pdo\Db;
 
 class DbTest extends \PHPUnit_Extensions_Database_TestCase
 {
