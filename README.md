@@ -1,6 +1,7 @@
 # Pdo
 
 [![Build Status][ico-travis]][link-travis]
+[![Coverage Status][ico-coveralls]][link-coveralls]
 
 A PDO wrapper, because the internet needed another PDO wrapper.
 
@@ -58,8 +59,10 @@ Bugfixes and updates to support new db drivers are welcome. Please submit pull r
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
+[ico-coveralls]: https://coveralls.io/repos/github/shinjin/pdo/badge.svg
 [ico-travis]: https://img.shields.io/travis/shinjin/pdo/master.svg?style=flat-square
 
 [link-author]: https://github.com/shinjin
 [link-github]: https://github.com/shinjin/pdo
+[link-coveralls]: https://coveralls.io/github/shinjin/pdo
 [link-travis]: https://travis-ci.org/shinjin/pdo
