@@ -22,9 +22,9 @@ $ composer require shinjin/pdo
 
 ``` php
 $connection_parameters = array(
-    'driver' => 'mysql',
-    'dbname' => 'dbtest',
-    'user' => 'shinjin',
+    'driver'   => 'mysql',
+    'dbname'   => 'dbtest',
+    'user'     => 'shinjin',
     'password' => 'awesomepasswd'
 );
 
@@ -35,11 +35,11 @@ $parameters = array(1);
 
 $result = $db->query($statement, $parameters)->fetchAll();
 ```
-Please see [Usage](docs/Usage.md) for a complete list of examples.
+See [Usage](docs/Usage.md) for a complete list of examples.
 
 ## Change log
 
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+See [CHANGELOG](CHANGELOG.md).
 
 ## Testing
 

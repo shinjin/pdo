@@ -158,7 +158,7 @@ class Db
     /**
      * Executes a prepared statement query.
      *
-     * @param \PDOStatement|string $statement PDO statement handle or query string
+     * @param \PDOStatement|string $statement PDOStatement object or query string
      * @param array                $params    Parameters to bind to query
      *
      * @return \PDOStatement
