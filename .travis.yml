@@ -11,6 +11,10 @@ env:
   - DB=pgsql
   - DB=sqlite
 
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 services:
   - mysql
   - postgresql
@@ -34,5 +38,6 @@ matrix:
       env: DB=pgsql
   allow_failures:
     - php: nightly
+  fast_finish: true
 
 sudo: false
