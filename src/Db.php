@@ -72,7 +72,7 @@ class Db
      *
      * @throws \Shinjin\Pdo\Exception\InvalidArgumentException
      */
-    public function __construct($pdo)
+    public function __construct($pdo, array $options = array())
     {
         if (!$pdo instanceof \PDO && !is_array($pdo)) {
             throw new InvalidArgumentException(
@@ -81,7 +81,7 @@ class Db
         }
 
         if (is_array($pdo)) {
-            $pdo = $this->connect($pdo);
+            $pdo = $this->connect($pdo, $options);
         }
 
         $this->pdo = $pdo;
