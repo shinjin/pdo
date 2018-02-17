@@ -308,8 +308,8 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
                 array('author' => 'joey')
             ),
             'update with verbose data' => array(
-                array('author' => array('=', 'joey')),
-                array('author' => 'joey')
+                array('author =' => 'joey'),
+                array('author'   => 'joey')
             )
         );
     }
@@ -459,17 +459,17 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
                 array(1)
             ),
             'verbose filter' => array(
-                array('id' => array('<>', 1)),
+                array('id <>' => 1),
                 '(id <> ?)',
                 array(1)
             ),
             'filters with implicit AND operator' => array(
-                array('id' => 1, 'created' => array('>', '2010-04-31')),
+                array('id' => 1, 'created >' => '2010-04-31'),
                 '(id = ? AND created > ?)',
                 array(1, '2010-04-31')
             ),
             'filters with OR operator' => array(
-                array('id' => 1, 'or', 'created' => array('>', '2010-04-31')),
+                array('id' => 1, 'or', 'created >' => '2010-04-31'),
                 '(id = ? OR created > ?)',
                 array(1, '2010-04-31')
             ),
@@ -504,9 +504,6 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
         return array(
             'filter starts with operator' => array(
                 array('or')
-            ),
-            'filter is invalid array' => array(
-                array('id' => array())
             ),
             'filter is invalid string' => array(
                 array('invalid')

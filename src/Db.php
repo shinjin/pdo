@@ -37,21 +37,6 @@ class Db
     );
 
     /**
-     * Supported comparison operators
-     *
-     * @var array
-     */
-    const OPERATORS = array(
-        '=',
-        '<>',
-        '>',
-        '<',
-        '>=',
-        '<=',
-        'LIKE'
-    );
-
-    /**
      * PDO object
      *
      * @var \PDO
@@ -238,18 +223,11 @@ class Db
         $params = array();
 
         foreach ($values as $column => $value) {
-            if (is_string($column)) {
-                if (is_array($value) and count($value) === 2) {
-                    $operator = $value[0];
-                    $value    = $value[1];
-                } else {
-                    $operator = '=';
-                }
-                $set .= sprintf('%s %s ?,', $column, $operator);
-                array_push($params, (string)$value);
-            } else {
-                $set .= (string)$value . ',';
+            if (strpos((string)$column, ' ') === false) {
+                $column .= ' =';
             }
+            $set .= $column . ' ?,';
+            array_push($params, (string)$value);
         }
 
         $statement = sprintf(
@@ -390,30 +368,19 @@ class Db
             }
 
             if (is_string($column)) {
-                if (is_array($value)) {
-                    $values = array_values($value);
-                    if (count($values) === 2 and
-                        is_string($values[0]) and
-                        in_array(strtoupper($values[0]), self::OPERATORS)
-                    ) {
-                        list($operator, $param) = $values;
-                    } else {
-                        throw new InvalidArgumentException(
-                            'Filter must be array containing operator and value.'
-                        );
-                    }
-                } else {
-                    $operator = '=';
-                    $param = $value;
+                if (strpos($column, ' ') === false) {
+                    $column .= ' =';
                 }
 
-                $filter .= sprintf('%s %s ?', $column, strtoupper($operator));
-                array_push($params, $param);
+                $filter .= $column . ' ?';
+                array_push($params, $value);
             } else {
                 if (is_array($value)) {
                     $filter .= $this->buildQueryFilter($value, $params);
                 } else {
-                    throw new InvalidArgumentException('Filter must be array.');
+                    throw new InvalidArgumentException(
+                        'Filter must be a key/value pair or array.'
+                    );
                 }
             }
 

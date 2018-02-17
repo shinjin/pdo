@@ -98,9 +98,9 @@ $filters = array('id' => 1);
 // (id = 1)
 ```
 
-Filter by other operators (eg. <>, >, >=) using the verbose format.
+Filter by other operators (eg. <>, >, >=) by specifying them in the key.
 ``` php
-$filters = array('id' => array('<>', 1));
+$filters = array('id <>' => 1);
 
 // (id <> 1)
 ```
@@ -108,8 +108,8 @@ $filters = array('id' => array('<>', 1));
 By default, multiple filters are separated with the AND operator.
 ``` php
 $filters = array(
-    'id'      => 1,
-    'created' => array('>', '2010-04-30')
+    'id'        => 1,
+    'created >' => '2010-04-30'
 );
 
 // (id = 1 AND created > '2010-4-30')
@@ -118,9 +118,9 @@ $filters = array(
 Separate filters with the OR operator by including an 'or' value between filters.
 ``` php
 $filters = array(
-    'id' => 1,
+    'id'        => 1,
     'or',
-    'created' => array('>', '2010-04-30')
+    'created >' => '2010-04-30'
 );
 
 // (id = 1 OR created > '2010-4-30')
@@ -131,9 +131,9 @@ Organize filters into groups using nested arrays.
 $filters = array(
     'id' => 1,
     array(
-        'author' => 'joe',
+        'author'    => 'joe',
         'or',
-        'created' => array('>', '2010-04-30')
+        'created >' => '2010-04-30'
     )
 ;
 
