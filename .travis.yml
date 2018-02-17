@@ -27,11 +27,10 @@ before_script:
   - psql -c 'create database dbtest;' -U postgres
 
 script:
-  - DB=$DB ./vendor/bin/phpunit --coverage-text
+  - DB=$DB ./vendor/bin/phpunit
 
 after_success:
-  # - travis_retry php vendor/bin/php-coveralls
-  - bash <(curl -s https://codecov.io/bash)
+  - travis_retry php vendor/bin/php-coveralls
 
 matrix:
   exclude:
