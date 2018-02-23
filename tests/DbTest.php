@@ -189,11 +189,15 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
                 'SELECT * FROM guestbook WHERE id = 1',
                 array()
             ),
-            'query with params 1' => array(
+            'query with scalar param' => array(
+                'SELECT * FROM guestbook WHERE id = ?',
+                1
+            ),
+            'query with array param 1' => array(
                 'SELECT * FROM guestbook WHERE id = ?',
                 array(1)
             ),
-            'query with params 2' => array(
+            'query with array param 2' => array(
                 'SELECT * FROM guestbook WHERE id = :id',
                 array(':id' => 1)
             ),

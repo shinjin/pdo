@@ -144,17 +144,19 @@ class Db
      * Executes a prepared statement query.
      *
      * @param \PDOStatement|string $statement PDOStatement object or query string
-     * @param array                $params    Parameters to bind to query
+     * @param array|scalar         $params    Parameters to bind to query
      *
      * @return \PDOStatement
      * @throws \Shinjin\Pdo\Exception\DbException
      */
-    public function query($statement, array $params = array()){
+    public function query($statement, $params = array()){
         if (!$statement instanceof \PDOStatement && !is_string($statement)) {
             throw new InvalidArgumentException(
                 '$statement must be a PDOStatement object or a string'
             );
         }
+
+        $params = (array)$params;
 
         try {
             if (is_string($statement)) {
@@ -179,15 +181,16 @@ class Db
      */
     public function insert($table, array $values)
     {
-        if (is_string(key($values))) {
-            $values = array($values);
-        }
-
-        if (empty($values[0])) {
+        if (empty($values)) {
             throw new InvalidArgumentException('$values must not be empty.');
         }
 
-        $statement = $this->buildInsertQuery($table, array_keys($values[0]));
+        if (count($values) === count($values, COUNT_RECURSIVE)) {
+            $values = array($values);
+        }
+
+        $columns   = array_keys(current($values));
+        $statement = $this->buildInsertQuery($table, $columns);
         $affected_rows = 0;
 
         foreach($values as $set) {
@@ -350,7 +353,7 @@ class Db
 
         $and_or = null;
         foreach($filters as $column => $value) {
-            if (is_integer($column) and is_string($value)) {
+            if (is_integer($column) && is_string($value)) {
                 if (in_array(strtoupper($value), array('AND', 'OR'))) {
                     if ($and_or === null) {
                         throw new InvalidArgumentException(
