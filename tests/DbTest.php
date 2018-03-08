@@ -350,6 +350,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
      * @covers \Shinjin\Pdo\Db::delete
      * @covers \Shinjin\Pdo\Db::buildQueryFilter
      * @covers \Shinjin\Pdo\Db::query
+     * @covers \Shinjin\Pdo\Db::quoteIdentifier
      */
     public function testDeletesRowAndReturnsAffectedRows()
     {
@@ -437,6 +438,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::buildInsertQuery
+     * @covers \Shinjin\Pdo\Db::quoteIdentifier
      */
     public function testBuildsInsertQuery(){
         $expected = 'INSERT INTO "guestbook" ("id","content","author","created") ' .
@@ -450,6 +452,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::buildQueryFilter
+     * @covers \Shinjin\Pdo\Db::quoteIdentifier
      * @dataProvider testBuildQueryFilterWorksDataProvider
      */
     public function testBuildQueryFilterWorks(
