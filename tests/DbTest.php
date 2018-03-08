@@ -159,7 +159,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     /**
      * @covers \Shinjin\Pdo\Db::connect
      * @covers \Shinjin\Pdo\Db::buildConnectionString
-     * @expectedException \Shinjin\Pdo\Exception\DbException
+     * @expectedException \PDOException
      */
     public function testThrowsExceptionWhenDbParametersAreInvalid()
     {
@@ -215,7 +215,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::query
-     * @expectedException \Shinjin\Pdo\Exception\DbException
+     * @expectedException \PDOException
      */
     public function testThrowsExceptionWhenQueryIsInvalid()
     {

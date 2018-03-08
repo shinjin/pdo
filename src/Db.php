@@ -1,7 +1,6 @@
 <?php
 namespace Shinjin\Pdo;
 
-use Shinjin\Pdo\Exception\DbException;
 use Shinjin\Pdo\Exception\InvalidArgumentException;
 
 class Db
@@ -101,7 +100,6 @@ class Db
      * @param array $options PDO options
      *
      * @return \PDO
-     * @throws \Shinjin\Pdo\Exception\DbException
      * @throws \Shinjin\Pdo\Exception\InvalidArgumentException
      */
     public function connect(array $params, array $options = array())
@@ -127,16 +125,12 @@ class Db
             $options
         );
 
-        try {
-            $pdo = new \PDO(
-                $this->buildConnectionString($db),
-                $db['user'],
-                $db['password'],
-                $options
-            );
-        } catch (\PDOException $e) {
-            throw new DbException($e->getMessage());
-        }
+        $pdo = new \PDO(
+            $this->buildConnectionString($db),
+            $db['user'],
+            $db['password'],
+            $options
+        );
 
         return $pdo;
     }
@@ -148,7 +142,6 @@ class Db
      * @param array|scalar         $params    Parameters to bind to query
      *
      * @return \PDOStatement
-     * @throws \Shinjin\Pdo\Exception\DbException
      */
     public function query($statement, $params = array()){
         if (!$statement instanceof \PDOStatement && !is_string($statement)) {
@@ -157,16 +150,10 @@ class Db
             );
         }
 
-        $params = (array)$params;
-
-        try {
-            if (is_string($statement)) {
-                $statement = $this->pdo->prepare($statement);
-            }
-            $statement->execute($params);
-        } catch (\PDOException $e) {
-            throw new DbException($e->getMessage());
+        if (is_string($statement)) {
+            $statement = $this->pdo->prepare($statement);
         }
+        $statement->execute((array)$params);
 
         return $statement;
     }
