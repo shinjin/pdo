@@ -11,3 +11,8 @@
 - Update query to accept scalar parameters 
 - Update docs
 - Bugfixes
+
+## [0.3.0] - 2018-03-08
+- Quote table and column names
+- Remove custom exceptions
+- Add charset to dsn
