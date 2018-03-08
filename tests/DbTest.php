@@ -105,7 +105,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::__construct
-     * @expectedException \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testThrowsExceptionWhenConstructorArgumentIsInvalid()
     {
@@ -147,7 +147,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::connect
-     * @expectedException \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testThrowsExceptionWhenDriverParameterIsInvalid()
     {
@@ -206,7 +206,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::query
-     * @expectedException \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testThrowsExceptionWhenQueryStatementIsInvalid()
     {
@@ -278,7 +278,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::insert
-     * @expectedException \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testThrowsExceptionWhenInsertDataIsEmpty()
     {
@@ -320,7 +320,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::update
-     * @expectedException \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testThrowsExceptionWhenUpdateDataIsEmpty()
     {
@@ -329,7 +329,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::update
-     * @expectedException \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testThrowsExceptionWhenUpdateFiltersAreEmpty()
     {
@@ -354,7 +354,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::delete
-     * @expectedException \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testThrowsExceptionWhenDeleteFiltersAreEmpty()
     {
@@ -494,7 +494,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::buildQueryFilter
-     * @expectedException \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @dataProvider testBuildQueryFilterThrowsExceptionDataProvider
      */
     public function testBuildQueryFilterThrowsExceptionWhenFiltersAreInvalid(

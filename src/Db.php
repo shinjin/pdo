@@ -1,8 +1,6 @@
 <?php
 namespace Shinjin\Pdo;
 
-use Shinjin\Pdo\Exception\InvalidArgumentException;
-
 class Db
 {
 
@@ -55,12 +53,12 @@ class Db
      *
      * @param \PDO|array $pdo PDO object
      *
-     * @throws \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function __construct($pdo, array $options = array())
     {
         if (!$pdo instanceof \PDO && !is_array($pdo)) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 '$pdo must be a PDO object or an array'
             );
         }
@@ -100,7 +98,7 @@ class Db
      * @param array $options PDO options
      *
      * @return \PDO
-     * @throws \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function connect(array $params, array $options = array())
     {
@@ -108,7 +106,7 @@ class Db
         if (!isset($params['driver']) ||
             !isset($default_params[$params['driver']])
         ) {
-            throw new InvalidArgumentException('Invalid db driver specified.');
+            throw new \InvalidArgumentException('Invalid db driver specified.');
         }
 
         $db = array_replace(
@@ -142,10 +140,11 @@ class Db
      * @param array|scalar         $params    Parameters to bind to query
      *
      * @return \PDOStatement
+     * @throws \InvalidArgumentException
      */
     public function query($statement, $params = array()){
         if (!$statement instanceof \PDOStatement && !is_string($statement)) {
-            throw new InvalidArgumentException(
+            throw new \InvalidArgumentException(
                 '$statement must be a PDOStatement object or a string'
             );
         }
@@ -165,12 +164,12 @@ class Db
      * @param array  $values List of column/value pairs to INSERT
      *
      * @return integer Number of affected rows
-     * @throws \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function insert($table, array $values)
     {
         if (empty($values)) {
-            throw new InvalidArgumentException('$values must not be empty.');
+            throw new \InvalidArgumentException('$values must not be empty.');
         }
 
         if (count($values) === count($values, COUNT_RECURSIVE)) {
@@ -198,16 +197,16 @@ class Db
      *                        WHERE clause
      *
      * @return integer Number of affected rows
-     * @throws \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function update($table, array $values, array $filters)
     {
         if (empty($values)) {
-            throw new InvalidArgumentException('$values must not be empty.');
+            throw new \InvalidArgumentException('$values must not be empty.');
         }
 
         if (empty($filters)) {
-            throw new InvalidArgumentException('$filters must not be empty.');
+            throw new \InvalidArgumentException('$filters must not be empty.');
         }
 
         $set = '';
@@ -239,11 +238,12 @@ class Db
      *                        WHERE clause
      *
      * @return integer Number of affected rows
+     * @throws \InvalidArgumentException
      */
     public function delete($table, array $filters)
     {
         if (empty($filters)) {
-            throw new InvalidArgumentException('$filters must not be empty.');
+            throw new \InvalidArgumentException('$filters must not be empty.');
         }
 
         $params = array();
@@ -334,7 +334,7 @@ class Db
      *                       in the filter string
      *
      * @return string Query filter string
-     * @throws \Shinjin\Pdo\Exception\InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function buildQueryFilter(array $filters, array &$params = array()){
         $filter = '(';
@@ -344,7 +344,7 @@ class Db
             if (is_integer($column) && is_string($value)) {
                 if (in_array(strtoupper($value), array('AND', 'OR'))) {
                     if ($and_or === null) {
-                        throw new InvalidArgumentException(
+                        throw new \InvalidArgumentException(
                             'Filter must not start with operator.'
                         );
                     }
@@ -369,7 +369,7 @@ class Db
                 if (is_array($value)) {
                     $filter .= $this->buildQueryFilter($value, $params);
                 } else {
-                    throw new InvalidArgumentException(
+                    throw new \InvalidArgumentException(
                         'Filter must be a key/value pair or array.'
                     );
                 }
