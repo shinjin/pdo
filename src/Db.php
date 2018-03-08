@@ -224,10 +224,8 @@ class Db
         $params = array();
 
         foreach ($values as $column => $value) {
-            $columns = explode(' ', $column);
-            $column  = $this->quoteIdentifier($columns[0]);
-            $column .= empty($columns[1]) ? ' =' : ' ' . $columns[1];
-            $set .= $column . ' ?,';
+            list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
+            $set .= $this->quoteIdentifier($column) . ' ' . $operator . ' ?,';
             array_push($params, (string)$value);
         }
 
@@ -370,10 +368,8 @@ class Db
             }
 
             if (is_string($column)) {
-                $columns = explode(' ', $column);
-                $column  = $this->quoteIdentifier($columns[0]);
-                $column .= empty($columns[1]) ? ' =' : ' ' . $columns[1];
-                $filter .= $column . ' ?';
+                list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
+                $filter .= $this->quoteIdentifier($column) . ' ' . $operator . ' ?';
                 array_push($params, $value);
             } else {
                 if (is_array($value)) {
