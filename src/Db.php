@@ -19,7 +19,8 @@ class Db
             'host' => null,
             'port' => null,
             'user' => null,
-            'password' => null
+            'password' => null,
+            'charset'  => 'utf8mb4'
         ),
         'mysql' => array(
             'host' => 'localhost',
@@ -409,7 +410,7 @@ class Db
 
             $dsn_params = array_intersect_key(
                 array_filter($db_params),
-                array_flip(array('dbname', 'host', 'port'))
+                array_flip(array('dbname', 'host', 'port', 'charset'))
             );
 
             $dsn .= urldecode(http_build_query($dsn_params, null, ';'));
