@@ -70,6 +70,15 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
         parent::setUp();
 
         $this->db = new Db(self::$pdo);
+
+        if (getenv('DB') === 'mysql') {
+            self::$pdo->exec("SET sql_mode = 'ANSI'");
+
+            $reflector = new \ReflectionObject($this->db);
+            $property = $reflector->getProperty('quote_delimiter');
+            $property->setAccessible(true);
+            $property->setValue($this->db, '"');
+        }
     }
 
     public function tearDown()
@@ -289,6 +298,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
      * @covers \Shinjin\Pdo\Db::update
      * @covers \Shinjin\Pdo\Db::buildQueryFilter
      * @covers \Shinjin\Pdo\Db::query
+     * @covers \Shinjin\Pdo\Db::quoteIdentifier
      * @dataProvider testUpdatesRowDataProvider
      */
     public function testUpdatesRowAndReturnsAffectedRows($data, $expected)
@@ -429,7 +439,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
      * @covers \Shinjin\Pdo\Db::buildInsertQuery
      */
     public function testBuildsInsertQuery(){
-        $expected = 'INSERT INTO guestbook (id,content,author,created) ' .
+        $expected = 'INSERT INTO "guestbook" ("id","content","author","created") ' .
                     'VALUES (?,?,?,?)';
 
         $columns = array('id', 'content', 'author', 'created');
@@ -459,22 +469,22 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
         return array(
             'default filter' => array(
                 array('id' => 1),
-                '(id = ?)',
+                '("id" = ?)',
                 array(1)
             ),
             'verbose filter' => array(
                 array('id <>' => 1),
-                '(id <> ?)',
+                '("id" <> ?)',
                 array(1)
             ),
             'filters with implicit AND operator' => array(
                 array('id' => 1, 'created >' => '2010-04-31'),
-                '(id = ? AND created > ?)',
+                '("id" = ? AND "created" > ?)',
                 array(1, '2010-04-31')
             ),
             'filters with OR operator' => array(
                 array('id' => 1, 'or', 'created >' => '2010-04-31'),
-                '(id = ? OR created > ?)',
+                '("id" = ? OR "created" > ?)',
                 array(1, '2010-04-31')
             ),
             'nested filters' => array(
@@ -486,7 +496,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
                         array('author' => 'suzy')
                     )
                 ),
-                '(id = ? AND (author = ? OR (author = ?)))',
+                '("id" = ? AND ("author" = ? OR ("author" = ?)))',
                 array(1, 'joe', 'suzy')
             ),
         );

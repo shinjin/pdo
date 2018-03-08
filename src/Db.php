@@ -42,6 +42,13 @@ class Db
     private $pdo;
 
     /**
+     * Character used to quote identifiers
+     *
+     * @var string
+     */
+    private $quote_delimiter;
+
+    /**
      * Transaction level
      *
      * @var integer
@@ -64,10 +71,14 @@ class Db
         }
 
         if (is_array($pdo)) {
-            $pdo = $this->connect($pdo, $options);
+            $this->pdo = $this->connect($pdo, $options);
+            $driver = $pdo['driver'];
+        } else {
+            $this->pdo = $pdo;
+            $driver = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
         }
 
-        $this->pdo = $pdo;
+        $this->quote_delimiter = $driver === 'mysql' ? '`' : '"';
         $this->transaction_level = 0;
     }
 
@@ -213,16 +224,16 @@ class Db
         $params = array();
 
         foreach ($values as $column => $value) {
-            if (strpos((string)$column, ' ') === false) {
-                $column .= ' =';
-            }
+            $columns = explode(' ', $column);
+            $column  = $this->quoteIdentifier($columns[0]);
+            $column .= empty($columns[1]) ? ' =' : ' ' . $columns[1];
             $set .= $column . ' ?,';
             array_push($params, (string)$value);
         }
 
         $statement = sprintf(
             'UPDATE %s SET %s WHERE %s',
-            $table,
+            $this->quoteIdentifier($table),
             rtrim($set, ','),
             $this->buildQueryFilter($filters, $params)
         );
@@ -249,7 +260,7 @@ class Db
         $params = array();
         $statement = sprintf(
             'DELETE FROM %s WHERE %s',
-            $table,
+            $this->quoteIdentifier($table),
             $this->buildQueryFilter($filters, $params)
         );
 
@@ -316,8 +327,8 @@ class Db
     {
         $statement = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
-            $table,
-            implode(',', array_values($columns)),
+            $this->quoteIdentifier($table),
+            implode(',', array_map(array($this, 'quoteIdentifier'), array_values($columns))),
             implode(',', array_fill(0, count($columns), '?'))
         );
 
@@ -359,10 +370,9 @@ class Db
             }
 
             if (is_string($column)) {
-                if (strpos($column, ' ') === false) {
-                    $column .= ' =';
-                }
-
+                $columns = explode(' ', $column);
+                $column  = $this->quoteIdentifier($columns[0]);
+                $column .= empty($columns[1]) ? ' =' : ' ' . $columns[1];
                 $filter .= $column . ' ?';
                 array_push($params, $value);
             } else {
@@ -406,4 +416,16 @@ class Db
         return $dsn;
     }
 
+    /**
+     * Quotes a table or column name.
+     *
+     * @param string $identifier Value to be quoted
+     *
+     * @return string The quoted value
+     */
+    private function quoteIdentifier($identifier)
+    {
+        $d = $this->quote_delimiter;
+        return $d . str_replace($d, $d.$d, $identifier) . $d;
+    }
 }
