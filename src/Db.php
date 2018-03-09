@@ -11,11 +11,11 @@ class Db
      */
     const DEFAULT_PARAMS = array(
         array(
-            'dsn' => null,
-            'dbname' => null,
-            'host' => null,
-            'port' => null,
-            'user' => null,
+            'dsn'      => null,
+            'dbname'   => null,
+            'host'     => null,
+            'port'     => null,
+            'user'     => null,
             'password' => null,
             'charset'  => 'utf8mb4'
         ),
@@ -187,8 +187,7 @@ class Db
             $values = array($values);
         }
 
-        $columns   = array_keys(current($values));
-        $statement = $this->buildInsertQuery($table, $columns);
+        $statement = $this->buildInsertQuery($table, array_keys(current($values)));
         $affected_rows = 0;
 
         foreach($values as $set) {
@@ -388,6 +387,19 @@ class Db
     }
 
     /**
+     * Quotes a table or column name.
+     *
+     * @param string $identifier Value to be quoted
+     *
+     * @return string The quoted value
+     */
+    public function quoteIdentifier($identifier)
+    {
+        $d = $this->quote_delimiter;
+        return $d . str_replace($d, $d.$d, $identifier) . $d;
+    }
+
+    /**
      * Creates a dsn connection string.
      *
      * @param array $db_params Db connection parameters
@@ -410,18 +422,5 @@ class Db
         }
 
         return $dsn;
-    }
-
-    /**
-     * Quotes a table or column name.
-     *
-     * @param string $identifier Value to be quoted
-     *
-     * @return string The quoted value
-     */
-    private function quoteIdentifier($identifier)
-    {
-        $d = $this->quote_delimiter;
-        return $d . str_replace($d, $d.$d, $identifier) . $d;
     }
 }
