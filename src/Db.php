@@ -3,7 +3,6 @@ namespace Shinjin\Pdo;
 
 class Db
 {
-
     /**
      * Default connection parameters
      *
@@ -402,25 +401,23 @@ class Db
     /**
      * Creates a dsn connection string.
      *
-     * @param array $db_params Db connection parameters
+     * @param array $params Db connection parameters
      *
      * @return string DSN connection string
      */
-    private function buildConnectionString(array $db_params)
+    private function buildConnectionString(array $params)
     {
-        $dsn = $db_params['dsn'];
-
-        if (empty($dsn)) {
-            $dsn = $db_params['driver'] . ':';
-
-            $dsn_params = array_intersect_key(
-                array_filter($db_params),
-                array_flip(array('dbname', 'host', 'port', 'charset'))
-            );
-
-            $dsn .= urldecode(http_build_query($dsn_params, null, ';'));
+        if (!empty($params['dsn'])) {
+            return $params['dsn'];
         }
 
-        return $dsn;
+        $dsn = $params['driver'] . ':';
+
+        $dsn_params = array_intersect_key(
+            array_filter($params),
+            array_flip(array('dbname', 'host', 'port', 'charset'))
+        );
+
+        return $dsn . urldecode(http_build_query($dsn_params, null, ';'));
     }
 }
