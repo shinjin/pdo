@@ -222,13 +222,13 @@ class Db
 
         foreach ($values as $column => $value) {
             list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
-            $set .= $this->quoteIdentifier($column) . ' ' . $operator . ' ?,';
+            $set .= sprintf('%s %s ?,', $this->quote($column), $operator);
             array_push($params, (string)$value);
         }
 
         $statement = sprintf(
             'UPDATE %s SET %s WHERE %s',
-            $this->quoteIdentifier($table),
+            $this->quote($table),
             rtrim($set, ','),
             $this->buildQueryFilter($filters, $params)
         );
@@ -255,7 +255,7 @@ class Db
         $params = array();
         $statement = sprintf(
             'DELETE FROM %s WHERE %s',
-            $this->quoteIdentifier($table),
+            $this->quote($table),
             $this->buildQueryFilter($filters, $params)
         );
 
@@ -322,8 +322,8 @@ class Db
     {
         $statement = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
-            $this->quoteIdentifier($table),
-            implode(',', array_map(array($this, 'quoteIdentifier'), array_values($columns))),
+            $this->quote($table),
+            implode(',', array_map(array($this, 'quote'), array_values($columns))),
             implode(',', array_fill(0, count($columns), '?'))
         );
 
@@ -366,7 +366,7 @@ class Db
 
             if (is_string($column)) {
                 list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
-                $filter .= $this->quoteIdentifier($column) . ' ' . $operator . ' ?';
+                $filter .= sprintf('%s %s ?', $this->quote($column), $operator);
                 array_push($params, $value);
             } else {
                 if (is_array($value)) {
@@ -387,14 +387,14 @@ class Db
     /**
      * Quotes a table or column name.
      *
-     * @param string $identifier Value to be quoted
+     * @param string $value Value to be quoted
      *
      * @return string The quoted value
      */
-    public function quoteIdentifier($identifier)
+    public function quote($value)
     {
         $d = $this->quote_delimiter;
-        return $d . str_replace($d, $d.$d, $identifier) . $d;
+        return $d . str_replace($d, $d.$d, $value) . $d;
     }
 
     /**
