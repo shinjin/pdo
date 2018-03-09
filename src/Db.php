@@ -112,9 +112,8 @@ class Db
      */
     public function connect(array $params, array $options = array())
     {
-        $default_params = self::DEFAULT_PARAMS; // for php 5.6 bc
-        if (!isset($params['driver']) ||
-            !isset($default_params[$params['driver']])
+        if (empty($params['driver']) ||
+            !array_key_exists($params['driver'], self::DEFAULT_PARAMS)
         ) {
             throw new \InvalidArgumentException('Invalid db driver specified.');
         }
