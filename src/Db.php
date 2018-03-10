@@ -132,14 +132,8 @@ class Db
             $options
         );
 
-        $pdo = new \PDO(
-            $this->buildConnectionString($db),
-            $db['user'],
-            $db['password'],
-            $options
-        );
-
-        return $pdo;
+        $dsn = $this->buildConnectionString($db);
+        return new \PDO($dsn, $db['user'], $db['password'], $options);
     }
 
     /**
@@ -161,6 +155,7 @@ class Db
         if (is_string($statement)) {
             $statement = $this->pdo->prepare($statement);
         }
+
         $statement->execute((array)$params);
 
         return $statement;
@@ -277,6 +272,7 @@ class Db
         }
 
         $this->transaction_level++;
+
         return $result;
     }
 
@@ -292,6 +288,7 @@ class Db
         }
 
         $this->pdo->exec('RELEASE SAVEPOINT LEVEL' . $this->transaction_level);
+
         return true;
     }
 
@@ -307,6 +304,7 @@ class Db
         }
 
         $this->pdo->exec('ROLLBACK TO SAVEPOINT LEVEL' . $this->transaction_level);
+
         return true;
     }
 
@@ -323,7 +321,7 @@ class Db
         $statement = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->quote($table),
-            implode(',', array_map(array($this, 'quote'), array_values($columns))),
+            implode(',', array_map(array($this, 'quote'), $columns)),
             implode(',', array_fill(0, count($columns), '?'))
         );
 
