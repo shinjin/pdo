@@ -534,6 +534,9 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
             ),
             'filter is invalid string' => array(
                 array('invalid')
+            ),
+            'filter contains invalid value' => array(
+                array('id' => new \stdClass())
             )
         );
     }

@@ -366,14 +366,18 @@ class Db
                 list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
                 $filter .= $this->quote($column) . ' ';
 
-                if (!is_array($value)) {
+                if (is_scalar($value)) {
                     $filter .= $operator . ' ?';
                     array_push($params, $value);
-                } else {
+                } elseif(is_array($value)) {
                     $filter .= sprintf('IN (%s)',
                         implode(',', array_fill(0, count($value), '?'))
                     );
                     $params = array_merge($params, $value);
+                } else {
+                    throw new \InvalidArgumentException(
+                        'Value must be a scalar or array.'
+                    );
                 }
             } else {
                 if (is_array($value)) {
