@@ -63,18 +63,16 @@ class Db
      */
     public function __construct($pdo, array $options = array())
     {
-        if (!$pdo instanceof \PDO && !is_array($pdo)) {
-            throw new \InvalidArgumentException(
-                '$pdo must be a PDO object or an array'
-            );
-        }
-
-        if (is_array($pdo)) {
+        if ($pdo instanceof \PDO) {
+            $this->pdo = $pdo;
+            $driver = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+        } elseif(is_array($pdo)) {
             $this->pdo = $this->connect($pdo, $options);
             $driver = $pdo['driver'];
         } else {
-            $this->pdo = $pdo;
-            $driver = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+            throw new \InvalidArgumentException(
+                '$pdo must be a PDO object or an array'
+            );
         }
 
         $this->quote_delimiter = $driver === 'mysql' ? '`' : '"';
@@ -133,6 +131,7 @@ class Db
         );
 
         $dsn = $this->buildConnectionString($db);
+
         return new \PDO($dsn, $db['user'], $db['password'], $options);
     }
 
@@ -218,7 +217,7 @@ class Db
         foreach ($values as $column => $value) {
             list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
             array_push($set, sprintf('%s %s ?', $this->quote($column), $operator));
-            array_push($params, (string)$value);
+            array_push($params, $value);
         }
 
         $statement = sprintf(
@@ -370,9 +369,7 @@ class Db
                     $filter .= $operator . ' ?';
                     array_push($params, $value);
                 } elseif(is_array($value)) {
-                    $filter .= sprintf('IN (%s)',
-                        implode(',', array_fill(0, count($value), '?'))
-                    );
+                    $filter .= 'IN (' . str_repeat('?,', count($value) - 1) . '?)';
                     $params = array_merge($params, $value);
                 } else {
                     throw new \InvalidArgumentException(
