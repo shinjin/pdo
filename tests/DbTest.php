@@ -480,8 +480,18 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
                 '("id" <> ?)',
                 array(1)
             ),
+            'filters with IN operator' => array(
+                array('id' => array(1, 2, 3)),
+                '("id" IN (?,?,?))',
+                array(1, 2, 3)
+            ),
             'filters with implicit AND operator' => array(
                 array('id' => 1, 'created >' => '2010-04-31'),
+                '("id" = ? AND "created" > ?)',
+                array(1, '2010-04-31')
+            ),
+            'filters with explicit AND operator' => array(
+                array('id' => 1, 'and', 'created >' => '2010-04-31'),
                 '("id" = ? AND "created" > ?)',
                 array(1, '2010-04-31')
             ),

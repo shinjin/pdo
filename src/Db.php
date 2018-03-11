@@ -212,19 +212,19 @@ class Db
             throw new \InvalidArgumentException('$filters must not be empty.');
         }
 
-        $set = '';
+        $set    = array();
         $params = array();
 
         foreach ($values as $column => $value) {
             list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
-            $set .= sprintf('%s %s ?,', $this->quote($column), $operator);
+            array_push($set, sprintf('%s %s ?', $this->quote($column), $operator));
             array_push($params, (string)$value);
         }
 
         $statement = sprintf(
             'UPDATE %s SET %s WHERE %s',
             $this->quote($table),
-            rtrim($set, ','),
+            implode(',', $set),
             $this->buildQueryFilter($filters, $params)
         );
 
@@ -364,8 +364,17 @@ class Db
 
             if (is_string($column)) {
                 list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
-                $filter .= sprintf('%s %s ?', $this->quote($column), $operator);
-                array_push($params, $value);
+                $filter .= $this->quote($column) . ' ';
+
+                if (!is_array($value)) {
+                    $filter .= $operator . ' ?';
+                    array_push($params, $value);
+                } else {
+                    $filter .= sprintf('IN (%s)',
+                        implode(',', array_fill(0, count($value), '?'))
+                    );
+                    $params = array_merge($params, $value);
+                }
             } else {
                 if (is_array($value)) {
                     $filter .= $this->buildQueryFilter($value, $params);
