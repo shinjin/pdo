@@ -16,3 +16,6 @@
 - Quote table and column names
 - Remove custom exceptions
 - Add charset to dsn
+
+## [0.4.0] - 2018-03-16
+- Add support for IN operator
