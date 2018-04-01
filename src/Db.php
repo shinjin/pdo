@@ -4,32 +4,42 @@ namespace Shinjin\Pdo;
 class Db
 {
     /**
-     * Default connection parameters
+     * List of supported drivers and parameters
      *
-     * @var array
+     * @const array
      */
-    const DEFAULT_PARAMS = array(
-        array(
-            'dsn'      => null,
-            'dbname'   => null,
-            'host'     => null,
-            'port'     => null,
-            'user'     => null,
-            'password' => null,
-            'charset'  => 'utf8mb4'
+    const DRIVERS = array(
+        'default' => array(
+            'db_params' => array(
+                'dsn'      => null,
+                'dbname'   => null,
+                'host'     => null,
+                'port'     => null,
+                'user'     => null,
+                'password' => null,
+                'charset'  => 'utf8mb4'
+            ),
+            'quote_delimiter' => '"'
         ),
         'mysql' => array(
-            'host' => 'localhost',
-            'port' => '3306',
-            'user' => 'root'
+            'db_params' => array(
+                'host' => 'localhost',
+                'port' => '3306',
+                'user' => 'root'
+            ),
+            'quote_delimiter' => '`'
         ),
         'pgsql' => array(
-            'host' => 'localhost',
-            'port' => '5432',
-            'user' => 'postgres'
+            'db_params' => array(
+                'host' => 'localhost',
+                'port' => '5432',
+                'user' => 'postgres'
+            )
         ),
         'sqlite' => array(
-            'dsn' => 'sqlite::memory:'
+            'db_params' => array(
+                'dsn' => 'sqlite::memory:'
+            )
         )
     );
 
@@ -41,11 +51,11 @@ class Db
     private $pdo;
 
     /**
-     * Character used to quote identifiers
+     * PDO driver params
      *
-     * @var string
+     * @var array
      */
-    private $quote_delimiter;
+    private $driver;
 
     /**
      * Transaction level
@@ -75,7 +85,10 @@ class Db
             );
         }
 
-        $this->quote_delimiter = $driver === 'mysql' ? '`' : '"';
+        $this->driver = array_replace_recursive(
+            self::DRIVERS['default'],
+            self::DRIVERS[$driver]
+        );
         $this->transaction_level = 0;
     }
 
@@ -111,14 +124,13 @@ class Db
     public function connect(array $params, array $options = array())
     {
         if (empty($params['driver']) ||
-            !array_key_exists($params['driver'], self::DEFAULT_PARAMS)
-        ) {
+            !array_key_exists($params['driver'], self::DRIVERS)) {
             throw new \InvalidArgumentException('Invalid db driver specified.');
         }
 
         $db = array_replace(
-            self::DEFAULT_PARAMS[0],
-            array_replace(self::DEFAULT_PARAMS[$params['driver']], $params)
+            self::DRIVERS['default']['db_params'],
+            array_replace(self::DRIVERS[$params['driver']]['db_params'], $params)
         );
 
         $options = array_replace(
@@ -401,7 +413,7 @@ class Db
      */
     public function quote($value)
     {
-        $d = $this->quote_delimiter;
+        $d = $this->driver['quote_delimiter'];
         return $d . str_replace($d, $d.$d, $value) . $d;
     }
 

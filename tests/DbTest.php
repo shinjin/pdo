@@ -75,9 +75,9 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
             self::$pdo->exec("SET sql_mode = 'ANSI'");
 
             $reflector = new \ReflectionObject($this->db);
-            $property = $reflector->getProperty('quote_delimiter');
+            $property = $reflector->getProperty('driver');
             $property->setAccessible(true);
-            $property->setValue($this->db, '"');
+            $property->setValue($this->db, array('quote_delimiter' => '"'));
         }
     }
 
