@@ -19,3 +19,6 @@
 
 ## [0.4.0] - 2018-03-16
 - Add support for IN operator
+
+## [0.5.0] - 2018-04-01
+- Add support for incrementing/deincrementing UPDATE values
