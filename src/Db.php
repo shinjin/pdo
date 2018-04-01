@@ -228,7 +228,13 @@ class Db
 
         foreach ($values as $column => $value) {
             list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
-            array_push($set, sprintf('%s %s ?', $this->quote($column), $operator));
+            $column = $this->quote($column);
+
+            if (in_array($operator, array('+=', '-='))) {
+                $operator = sprintf('= %s %s', $column, substr($operator, 0, 1));
+            }
+
+            array_push($set, sprintf('%s %s ?', $column, $operator));
             array_push($params, $value);
         }
 
