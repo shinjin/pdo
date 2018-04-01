@@ -330,6 +330,25 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::update
+     * @covers \Shinjin\Pdo\Db::buildQueryFilter
+     * @covers \Shinjin\Pdo\Db::query
+     * @covers \Shinjin\Pdo\Db::quote
+     */
+    public function testUpdateIncrementsRowAndReturnsAffectedRows()
+    {
+        $affected_rows = $this->db->update('guestbook', array('id +=' => 1), array('author' => 'suzy'));
+
+        $this->assertSame(1, $affected_rows);
+
+        $actual = $this->db->query(
+            "SELECT id FROM guestbook WHERE author = 'suzy'"
+        )->fetchAll();
+
+        $this->assertSame(array(array('id' => 4)), $actual);
+    }
+
+    /**
+     * @covers \Shinjin\Pdo\Db::update
      * @expectedException \InvalidArgumentException
      */
     public function testThrowsExceptionWhenUpdateDataIsEmpty()
