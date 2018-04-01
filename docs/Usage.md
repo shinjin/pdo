@@ -82,6 +82,16 @@ $filters = array('id' => 1);
 $affected_rows = $db->update($table, $values, $filters);
 ```
 
+Increment/deincrement **update** values using the special **+=** or **-=** operators.
+``` php
+$table   = 'guestbook';
+$values  = array('views +=' => 1);
+$filters = array('id' => 1);
+
+$affected_rows = $db->update($table, $values, $filters);
+// increments views by 1
+```
+
 Delete records using the **delete** method.
 ``` php
 $table   = 'guestbook';
