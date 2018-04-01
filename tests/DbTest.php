@@ -45,6 +45,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
                 id      integer primary key,
                 content varchar(255),
                 author  varchar(255),
+                views   integer,
                 created date
             )');
 
@@ -58,9 +59,9 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     {
         return $this->createArrayDataSet(array(
             'guestbook' => array(
-                array('id' => 1, 'content' => 'Hello buddy!', 'author' => 'joe', 'created' => '2010-04-24'),
-                array('id' => 2, 'content' => 'I like it!', 'author' => 'nancy', 'created' => '2010-04-26'),
-                array('id' => 3, 'content' => 'Hello world!', 'author' => 'suzy', 'created' => '2010-05-01')
+                array('id' => 1, 'content' => 'Hello buddy!', 'author' => 'joe', 'views' => 1, 'created' => '2010-04-24'),
+                array('id' => 2, 'content' => 'I like it!', 'author' => 'nancy', 'views' => 0, 'created' => '2010-04-26'),
+                array('id' => 3, 'content' => 'Hello world!', 'author' => 'suzy', 'views' => 0, 'created' => '2010-05-01')
             ),
         ));
     }
@@ -239,9 +240,10 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     public function testInsertsRow()
     {
         $data = array(
-            'id' => 4,
+            'id'      => 4,
             'content' => 'Hello world!',
-            'author' => 'quinn',
+            'author'  => 'quinn',
+            'views'   => 0,
             'created' => '2016-04-13'
         );
         $this->db->insert('guestbook', $data);
@@ -264,15 +266,17 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     {
         $data = array(
             array(
-                'id' => 4,
+                'id'      => 4,
                 'content' => 'Hello world!',
-                'author' => 'quinn',
+                'author'  => 'quinn',
+                'views'   => 0,
                 'created' => '2016-04-13'
             ),
             array(
-                'id' => 5,
+                'id'      => 5,
                 'content' => null,
                 'author'  => null,
+                'views'   => null,
                 'created' => null
             )
         );
@@ -308,43 +312,28 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertSame(1, $affected_rows);
 
         $actual = $this->db->query(
-            'SELECT author FROM guestbook WHERE id = 1'
+            'SELECT views FROM guestbook WHERE id = 1'
         )->fetchAll();
 
-        $this->assertSame(array($expected), $actual);
+        $this->assertEquals(array($expected), $actual);
     }
 
     public function testUpdatesRowDataProvider()
     {
         return array(
             'update with default data' => array(
-                array('author' => 'joey'),
-                array('author' => 'joey')
+                array('views' => 2),
+                array('views' => 2)
             ),
             'update with verbose data' => array(
-                array('author =' => 'joey'),
-                array('author'   => 'joey')
+                array('views =' => 2),
+                array('views' => 2)
+            ),
+            'update with incrementer' => array(
+                array('views +=' => 2),
+                array('views' => 3)
             )
         );
-    }
-
-    /**
-     * @covers \Shinjin\Pdo\Db::update
-     * @covers \Shinjin\Pdo\Db::buildQueryFilter
-     * @covers \Shinjin\Pdo\Db::query
-     * @covers \Shinjin\Pdo\Db::quote
-     */
-    public function testUpdateIncrementsRowAndReturnsAffectedRows()
-    {
-        $affected_rows = $this->db->update('guestbook', array('id +=' => 1), array('author' => 'suzy'));
-
-        $this->assertSame(1, $affected_rows);
-
-        $actual = $this->db->query(
-            "SELECT id FROM guestbook WHERE author = 'suzy'"
-        )->fetchAll();
-
-        $this->assertSame(array(array('id' => 4)), $actual);
     }
 
     /**
