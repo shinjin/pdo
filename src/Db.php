@@ -231,7 +231,7 @@ class Db
             $column = $this->quote($column);
 
             if (in_array($operator, array('+=', '-='))) {
-                $operator = sprintf('= %s %s', $column, substr($operator, 0, 1));
+                $operator = sprintf('= %s %s', $column, rtrim($operator, '='));
             }
 
             array_push($set, sprintf('%s %s ?', $column, $operator));
