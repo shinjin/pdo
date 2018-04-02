@@ -322,6 +322,16 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
+     * @covers \Shinjin\Pdo\Db::insert
+     * @expectedException \PDOException
+     */
+    public function testThrowsExceptionWhenInsertFails()
+    {
+        $data = array('id' => 1);
+        $this->db->insert('guestbook', $data);
+    }
+
+    /**
      * @covers \Shinjin\Pdo\Db::update
      * @covers \Shinjin\Pdo\Db::buildQueryFilter
      * @covers \Shinjin\Pdo\Db::query
