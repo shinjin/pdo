@@ -22,3 +22,6 @@
 
 ## [0.5.0] - 2018-04-01
 - Add support for incrementing/deincrementing UPDATE values
+
+## [0.6.0] - 2018-04-02
+- Add support for upserts (insert or update on duplicate key)
