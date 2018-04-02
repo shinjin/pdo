@@ -201,7 +201,9 @@ class Db
                 $statement = $this->query($statement, array_values($set));
                 $affected_rows += $statement->rowCount();
             } catch (\PDOException $e) {
-                if ($e->errorInfo[0] === '23000' && $key !== null) {
+                // state codes for constraint violations
+                if (($e->errorInfo[0] === '23000' ||
+                     $e->errorInfo[0] === '23505') && $key !== null) {
                     $keys = array_flip((array)$key);
                     $affected_rows += $this->update(
                         $table,
