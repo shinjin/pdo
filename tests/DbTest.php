@@ -291,6 +291,29 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::insert
+     * @covers \Shinjin\Pdo\Db::buildInsertQuery
+     * @covers \Shinjin\Pdo\Db::query
+     */
+    public function testUpdatesRowOnDuplicateKey()
+    {
+        $data = array(
+            'id'      => 1,
+            'content' => 'Hello world!',
+            'author'  => 'quinn',
+            'views'   => 0,
+            'created' => '2016-04-13'
+        );
+        $this->db->insert('guestbook', $data, 'id');
+
+        $actual = $this->db->query(
+            'SELECT * FROM guestbook WHERE id = ' . $data['id']
+        )->fetchAll();
+
+        $this->assertEquals(array($data), $actual);
+    }
+
+    /**
+     * @covers \Shinjin\Pdo\Db::insert
      * @expectedException \InvalidArgumentException
      */
     public function testThrowsExceptionWhenInsertDataIsEmpty()

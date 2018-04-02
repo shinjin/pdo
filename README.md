@@ -8,6 +8,7 @@ A PDO wrapper, because the internet needed another PDO wrapper.
 Use shinjin/pdo if you need a thin wrapper that:
 * uses arrays to unpack query values
 * uses prepared statements to execute queries and bulk operations
+* supports upserts (insert or update on duplicate key)
 * supports nested transactions
 
 ## Install

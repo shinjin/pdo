@@ -73,6 +73,21 @@ $affected_rows = $db->insert($table, $values);
 // 2 affected rows
 ```
 
+If key column(s) are passed in the optional third argument, **insert** will attempt to **update** the existing entry on duplicate key error.
+``` php
+$table  = 'guestbook';
+$values = array(
+    'id'      => 1,
+    'author'  => 'quinn',
+    'content' => 'Hello world!',
+    'created' => '2016-04-13'
+);
+
+$affected_rows = $db->insert($table, $values, 'id');
+
+// entry 1 has been updated!
+```
+
 Update existing records using the **update** method.
 ``` php
 $table   = 'guestbook';

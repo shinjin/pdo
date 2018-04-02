@@ -175,13 +175,15 @@ class Db
     /**
      * Creates an INSERT query and executes it.
      *
-     * @param string $table  Table name
-     * @param array  $values List of column/value pairs to INSERT
+     * @param string       $table  Table name
+     * @param array        $values List of column/value pairs to INSERT
+     * @param string|array $key    Key column(s). If provided, method will
+     *                             attempt to update on duplicate key error.
      *
      * @return integer Number of affected rows
      * @throws \InvalidArgumentException
      */
-    public function insert($table, array $values)
+    public function insert($table, array $values, $key = null)
     {
         if (empty($values)) {
             throw new \InvalidArgumentException('$values must not be empty.');
@@ -195,8 +197,21 @@ class Db
         $affected_rows = 0;
 
         foreach($values as $set) {
-            $statement = $this->query($statement, array_values($set));
-            $affected_rows += $statement->rowCount();
+            try {
+                $statement = $this->query($statement, array_values($set));
+                $affected_rows += $statement->rowCount();
+            } catch (\PDOException $e) {
+                if ($e->errorInfo[0] === '23000' && $key !== null) {
+                    $keys = array_flip((array)$key);
+                    $affected_rows += $this->update(
+                        $table,
+                        array_diff_key($set, $keys),
+                        array_intersect_key($set, $keys)
+                    );
+                } else {
+                    throw $e;
+                }
+            }
         }
         
         return $affected_rows;
@@ -230,7 +245,7 @@ class Db
             list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
             $column = $this->quote($column);
 
-            if (in_array($operator, array('+=', '-='))) {
+            if ($operator === '+=' || $operator === '-=') {
                 $operator = sprintf('= %s %s', $column, rtrim($operator, '='));
             }
 
