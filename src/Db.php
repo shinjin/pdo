@@ -205,11 +205,18 @@ class Db
                 if (($e->errorInfo[0] === '23000' ||
                      $e->errorInfo[0] === '23505') && $key !== null) {
                     $keys = array_flip((array)$key);
-                    $affected_rows += $this->update(
-                        $table,
-                        array_diff_key($set, $keys),
-                        array_intersect_key($set, $keys)
-                    );
+                    $filters = array_intersect_key($set, $keys);
+
+                    // if key values are not empty
+                    if (count($filters) === count(array_filter($filters))) {
+                        $affected_rows += $this->update(
+                            $table,
+                            array_diff_key($set, $keys),
+                            $filters    
+                        );
+                    } else {
+                        throw $e;
+                    }
                 } else {
                     throw $e;
                 }
