@@ -405,6 +405,13 @@ class Db
 
             if (is_string($column)) {
                 list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
+
+                // if column contains qualifier, separate and quote it
+                if (strpos($column, '.') !== false) {
+                    list($qualifier, $column) = explode('.', $column);
+                    $filter .= $this->quote($qualifier) . '.';
+                }
+
                 $filter .= $this->quote($column) . ' ';
 
                 if (is_scalar($value)) {

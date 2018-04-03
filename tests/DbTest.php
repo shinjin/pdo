@@ -531,7 +531,12 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
                 '("id" <> ?)',
                 array(1)
             ),
-            'filters with IN operator' => array(
+            'filter with qualifier' => array(
+                array('table.id' => 1),
+                '("table"."id" = ?)',
+                array(1)
+            ),
+            'filter with IN operator' => array(
                 array('id' => array(1, 2, 3)),
                 '("id" IN (?,?,?))',
                 array(1, 2, 3)
