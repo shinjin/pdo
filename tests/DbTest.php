@@ -45,8 +45,8 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
                 id      integer primary key,
                 content varchar(255),
                 author  varchar(255),
-                views   integer,
-                created date
+                created date,
+                views   integer
             )');
 
             $this->conn = $this->createDefaultDBConnection(self::$pdo);
@@ -59,9 +59,9 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     {
         return $this->createArrayDataSet(array(
             'guestbook' => array(
-                array('id' => 1, 'content' => 'Hello buddy!', 'author' => 'joe', 'views' => 1, 'created' => '2010-04-24'),
-                array('id' => 2, 'content' => 'I like it!', 'author' => 'nancy', 'views' => 0, 'created' => '2010-04-26'),
-                array('id' => 3, 'content' => 'Hello world!', 'author' => 'suzy', 'views' => 0, 'created' => '2010-05-01')
+                array('id' => 1, 'content' => 'Hello buddy!', 'author' => 'joe', 'created' => '2010-04-24', 'views' => 1),
+                array('id' => 2, 'content' => 'I like it!', 'author' => 'nancy', 'created' => '2010-04-26', 'views' => 0),
+                array('id' => 3, 'content' => 'Hello world!', 'author' => 'suzy', 'created' => '2010-05-01', 'views' => 0)
             ),
         ));
     }
@@ -243,8 +243,8 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
             'id'      => 4,
             'content' => 'Hello world!',
             'author'  => 'quinn',
-            'views'   => 0,
-            'created' => '2016-04-13'
+            'created' => '2016-04-13',
+            'views'   => 0
         );
         $this->db->insert('guestbook', $data);
 
@@ -269,15 +269,15 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
                 'id'      => 4,
                 'content' => 'Hello world!',
                 'author'  => 'quinn',
-                'views'   => 0,
-                'created' => '2016-04-13'
+                'created' => '2016-04-13',
+                'views'   => 0
             ),
             array(
                 'id'      => 5,
                 'content' => null,
                 'author'  => null,
-                'views'   => null,
-                'created' => null
+                'created' => null,
+                'views'   => null
             )
         );
         $this->db->insert('guestbook', $data);
@@ -300,8 +300,8 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
             'id'      => 1,
             'content' => 'Hello world!',
             'author'  => 'quinn',
-            'views'   => 0,
-            'created' => '2016-04-13'
+            'created' => '2016-04-13',
+            'views'   => 0
         );
         $this->db->insert('guestbook', $data, 'id');
 
@@ -329,6 +329,16 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     {
         $data = array('id' => 1);
         $this->db->insert('guestbook', $data);
+    }
+
+    /**
+     * @covers \Shinjin\Pdo\Db::insert
+     * @expectedException \PDOException
+     */
+    public function testThrowsExceptionWhenInsertFails2()
+    {
+        $data = array('id' => 1, 'content' => null);
+        $this->db->insert('guestbook', $data, 'content');
     }
 
     /**
