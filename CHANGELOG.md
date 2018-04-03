@@ -25,3 +25,7 @@
 
 ## [0.6.0] - 2018-04-02
 - Add support for upserts (insert or update on duplicate key)
+
+## [0.6.1] - 2018-04-03
+- Update upsert logic to deal with empty key values
+- Update buildQueryFilter to quote qualified columns correctly
