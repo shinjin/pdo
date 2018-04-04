@@ -207,8 +207,7 @@ class Db
                     $keys = array_flip((array)$key);
                     $filters = array_intersect_key($set, $keys);
 
-                    // if key values are not empty
-                    if (count($filters) === count(array_filter($filters))) {
+                    if (!in_array(null, $filters, true)) {
                         $affected_rows += $this->update(
                             $table,
                             array_diff_key($set, $keys),
@@ -359,10 +358,14 @@ class Db
      */
     public function buildInsertQuery($table, array $columns)
     {
+        $columns = array_map(function($column){
+            return $this->quote(rtrim($column, ' +-='));
+        }, $columns);
+
         $statement = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->quote($table),
-            implode(',', array_map(array($this, 'quote'), $columns)),
+            implode(',', $columns),
             implode(',', array_fill(0, count($columns), '?'))
         );
 
