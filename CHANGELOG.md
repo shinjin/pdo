@@ -29,3 +29,6 @@
 ## [0.6.1] - 2018-04-03
 - Update upsert logic to deal with empty key values
 - Update buildQueryFilter to quote qualified columns correctly
+
+## [0.6.2] - 2018-04-04
+- Update to allow incrementing operators in inserts
