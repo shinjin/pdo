@@ -32,3 +32,6 @@
 
 ## [0.6.2] - 2018-04-04
 - Update to allow incrementing operators in inserts
+
+## [0.6.3] - 2018-04-05
+- Explicitly set error mode to exception
