@@ -85,6 +85,9 @@ class Db
             );
         }
 
+        // explicitly set error mode to exception
+        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
         $this->driver = array_replace_recursive(
             self::DRIVERS['default'],
             self::DRIVERS[$driver]
@@ -136,8 +139,7 @@ class Db
         $options = array_replace(
             array(
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-                \PDO::ATTR_EMULATE_PREPARES   => false,
-                \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION
+                \PDO::ATTR_EMULATE_PREPARES   => false
             ),
             $options
         );
