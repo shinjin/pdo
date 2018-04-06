@@ -10,7 +10,7 @@ class Db
      */
     const DRIVERS = array(
         'default' => array(
-            'db_params' => array(
+            'pdo_params' => array(
                 'dsn'      => null,
                 'dbname'   => null,
                 'host'     => null,
@@ -19,10 +19,14 @@ class Db
                 'password' => null,
                 'charset'  => 'utf8mb4'
             ),
+            'pdo_options' => array(
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                \PDO::ATTR_EMULATE_PREPARES   => false
+            ),
             'quote_delimiter' => '"'
         ),
         'mysql' => array(
-            'db_params' => array(
+            'pdo_params' => array(
                 'host' => 'localhost',
                 'port' => '3306',
                 'user' => 'root'
@@ -30,14 +34,14 @@ class Db
             'quote_delimiter' => '`'
         ),
         'pgsql' => array(
-            'db_params' => array(
+            'pdo_params' => array(
                 'host' => 'localhost',
                 'port' => '5432',
                 'user' => 'postgres'
             )
         ),
         'sqlite' => array(
-            'db_params' => array(
+            'pdo_params' => array(
                 'dsn' => 'sqlite::memory:'
             )
         )
@@ -132,19 +136,16 @@ class Db
         }
 
         $db = array_replace(
-            self::DRIVERS['default']['db_params'],
-            array_replace(self::DRIVERS[$params['driver']]['db_params'], $params)
-        );
-
-        $options = array_replace(
-            array(
-                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-                \PDO::ATTR_EMULATE_PREPARES   => false
-            ),
-            $options
+            self::DRIVERS['default']['pdo_params'],
+            array_replace(self::DRIVERS[$params['driver']]['pdo_params'], $params)
         );
 
         $dsn = $this->buildConnectionString($db);
+
+        $options = array_replace(
+            self::DRIVERS['default']['pdo_options'],
+            $options
+        );
 
         return new \PDO($dsn, $db['user'], $db['password'], $options);
     }
