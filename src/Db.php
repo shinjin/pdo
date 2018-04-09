@@ -1,6 +1,9 @@
 <?php
 namespace Shinjin\Pdo;
 
+use Shinjin\Pdo\Exception\BadFilterException;
+use Shinjin\Pdo\Exception\BadValueException;
+
 class Db
 {
     /**
@@ -85,7 +88,7 @@ class Db
             $driver = $pdo['driver'];
         } else {
             throw new \InvalidArgumentException(
-                '$pdo must be a PDO object or an array'
+                'PDO argument must be a PDO object or an array.'
             );
         }
 
@@ -113,7 +116,7 @@ class Db
         $method = array($this->pdo, $name);
 
         if (!is_callable($method)) {
-            throw new \BadMethodCallException("Db does not have a method '$name'");
+            throw new \BadMethodCallException("Db does not have a method '$name'.");
         }
 
         return call_user_func_array($method, $args);
@@ -132,7 +135,7 @@ class Db
     {
         if (empty($params['driver']) ||
             !array_key_exists($params['driver'], self::DRIVERS)) {
-            throw new \InvalidArgumentException('Invalid db driver specified.');
+            throw new \InvalidArgumentException('Invalid db driver provided.');
         }
 
         $db = array_replace(
@@ -162,7 +165,7 @@ class Db
     public function query($statement, $params = array()){
         if (!$statement instanceof \PDOStatement && !is_string($statement)) {
             throw new \InvalidArgumentException(
-                '$statement must be a PDOStatement object or a string'
+                'Query statement must be a PDOStatement object or a string.'
             );
         }
 
@@ -184,12 +187,12 @@ class Db
      *                             attempt to update on duplicate key error.
      *
      * @return integer Number of affected rows
-     * @throws \InvalidArgumentException
+     * @throws \Shinjin\Pdo\Exception\BadValueException
      */
     public function insert($table, array $values, $key = null)
     {
         if (empty($values)) {
-            throw new \InvalidArgumentException('$values must not be empty.');
+            throw new BadValueException('Insert values must not be empty.');
         }
 
         if (count($values) === count($values, COUNT_RECURSIVE)) {
@@ -237,16 +240,17 @@ class Db
      *                        WHERE clause
      *
      * @return integer Number of affected rows
-     * @throws \InvalidArgumentException
+     * @throws \Shinjin\Pdo\Exception\BadValueException
+     * @throws \Shinjin\Pdo\Exception\BadFilterException
      */
     public function update($table, array $values, array $filters)
     {
         if (empty($values)) {
-            throw new \InvalidArgumentException('$values must not be empty.');
+            throw new BadValueException('Update values must not be empty.');
         }
 
         if (empty($filters)) {
-            throw new \InvalidArgumentException('$filters must not be empty.');
+            throw new BadFilterException('Update filters must not be empty.');
         }
 
         $set    = array();
@@ -282,12 +286,12 @@ class Db
      *                        WHERE clause
      *
      * @return integer Number of affected rows
-     * @throws \InvalidArgumentException
+     * @throws \Shinjin\Pdo\Exception\BadFilterException
      */
     public function delete($table, array $filters)
     {
         if (empty($filters)) {
-            throw new \InvalidArgumentException('$filters must not be empty.');
+            throw new BadFilterException('Delete filters must not be empty.');
         }
 
         $params = array();
@@ -385,7 +389,8 @@ class Db
      *                       in the filter string
      *
      * @return string Query filter string
-     * @throws \InvalidArgumentException
+     * @throws \Shinjin\Pdo\Exception\BadValueException
+     * @throws \Shinjin\Pdo\Exception\BadFilterException
      */
     public function buildQueryFilter(array $filters, array &$params = array()){
         $filter = '(';
@@ -395,7 +400,7 @@ class Db
             if (is_integer($column) && is_string($value)) {
                 if (in_array(strtoupper($value), array('AND', 'OR'))) {
                     if ($and_or === null) {
-                        throw new \InvalidArgumentException(
+                        throw new BadFilterException(
                             'Filter must not start with operator.'
                         );
                     }
@@ -427,7 +432,7 @@ class Db
                     $filter .= 'IN (' . str_repeat('?,', count($value) - 1) . '?)';
                     $params = array_merge($params, $value);
                 } else {
-                    throw new \InvalidArgumentException(
+                    throw new BadValueException(
                         'Value must be a scalar or array.'
                     );
                 }
@@ -435,7 +440,7 @@ class Db
                 if (is_array($value)) {
                     $filter .= $this->buildQueryFilter($value, $params);
                 } else {
-                    throw new \InvalidArgumentException(
+                    throw new BadFilterException(
                         'Filter must be a key/value pair or array.'
                     );
                 }
