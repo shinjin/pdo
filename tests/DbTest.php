@@ -115,7 +115,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::__construct
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Shinjin\Pdo\Exception\BadArgumentException
      */
     public function testThrowsExceptionWhenConstructorArgumentIsInvalid()
     {
@@ -157,7 +157,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::connect
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Shinjin\Pdo\Exception\BadArgumentException
      */
     public function testThrowsExceptionWhenDriverParameterIsInvalid()
     {
@@ -216,7 +216,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::query
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Shinjin\Pdo\Exception\BadArgumentException
      */
     public function testThrowsExceptionWhenQueryStatementIsInvalid()
     {

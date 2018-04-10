@@ -1,6 +1,7 @@
 <?php
 namespace Shinjin\Pdo;
 
+use Shinjin\Pdo\Exception\BadArgumentException;
 use Shinjin\Pdo\Exception\BadFilterException;
 use Shinjin\Pdo\Exception\BadValueException;
 
@@ -76,7 +77,7 @@ class Db
      *
      * @param \PDO|array $pdo PDO object
      *
-     * @throws \InvalidArgumentException
+     * @throws \Shinjin\Pdo\Exception\BadArgumentException
      */
     public function __construct($pdo, array $options = array())
     {
@@ -87,7 +88,7 @@ class Db
             $this->pdo = $this->connect($pdo, $options);
             $driver = $pdo['driver'];
         } else {
-            throw new \InvalidArgumentException(
+            throw new BadArgumentException(
                 'PDO argument must be a PDO object or an array.'
             );
         }
@@ -129,13 +130,13 @@ class Db
      * @param array $options PDO options
      *
      * @return \PDO
-     * @throws \InvalidArgumentException
+     * @throws \Shinjin\Pdo\Exception\BadArgumentException
      */
     public function connect(array $params, array $options = array())
     {
         if (empty($params['driver']) ||
             !array_key_exists($params['driver'], self::DRIVERS)) {
-            throw new \InvalidArgumentException('Invalid db driver provided.');
+            throw new BadArgumentException('Invalid db driver provided.');
         }
 
         $db = array_replace(
@@ -160,11 +161,11 @@ class Db
      * @param array|scalar         $params    Parameters to bind to query
      *
      * @return \PDOStatement
-     * @throws \InvalidArgumentException
+     * @throws \Shinjin\Pdo\Exception\BadArgumentException
      */
     public function query($statement, $params = array()){
         if (!$statement instanceof \PDOStatement && !is_string($statement)) {
-            throw new \InvalidArgumentException(
+            throw new BadArgumentException(
                 'Query statement must be a PDOStatement object or a string.'
             );
         }
