@@ -163,7 +163,8 @@ class Db
      * @return \PDOStatement
      * @throws \Shinjin\Pdo\Exception\BadArgumentException
      */
-    public function query($statement, $params = array()){
+    public function query($statement, $params = array())
+    {
         if (!$statement instanceof \PDOStatement && !is_string($statement)) {
             throw new BadArgumentException(
                 'Query statement must be a PDOStatement object or a string.'
@@ -393,7 +394,8 @@ class Db
      * @throws \Shinjin\Pdo\Exception\BadValueException
      * @throws \Shinjin\Pdo\Exception\BadFilterException
      */
-    public function buildQueryFilter(array $filters, array &$params = array()){
+    public function buildQueryFilter(array $filters, array &$params = array())
+    {
         $filter = '(';
 
         $and_or = null;
