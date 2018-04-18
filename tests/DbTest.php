@@ -43,10 +43,15 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
             self::$pdo->query('CREATE TABLE IF NOT EXISTS guestbook (
                 id      integer primary key,
+                author  integer,
                 content varchar(255),
-                author  varchar(255),
                 created date,
                 views   integer
+            )');
+
+            self::$pdo->query('CREATE TABLE IF NOT EXISTS author (
+                id   integer primary key,
+                name varchar(255)
             )');
 
             $this->conn = $this->createDefaultDBConnection(self::$pdo);
@@ -59,9 +64,14 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     {
         return $this->createArrayDataSet(array(
             'guestbook' => array(
-                array('id' => 1, 'content' => 'Hello buddy!', 'author' => 'joe', 'created' => '2010-04-24', 'views' => 1),
-                array('id' => 2, 'content' => 'I like it!', 'author' => 'nancy', 'created' => '2010-04-26', 'views' => 0),
-                array('id' => 3, 'content' => 'Hello world!', 'author' => 'suzy', 'created' => '2010-05-01', 'views' => 0)
+                array('id' => 1, 'author' => 1, 'content' => 'Hello buddy!', 'created' => '2010-04-24', 'views' => 1),
+                array('id' => 2, 'author' => 2, 'content' => 'I like it!', 'created' => '2010-04-26', 'views' => 0),
+                array('id' => 3, 'author' => 3, 'content' => 'Hello world!', 'created' => '2010-05-01', 'views' => 0)
+            ),
+            'author' => array(
+                array('id' => 1, 'name' => 'joe'),
+                array('id' => 2, 'name' => 'nancy'),
+                array('id' => 3, 'name' => 'suzy')
             ),
         ));
     }
@@ -241,8 +251,8 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     {
         $data = array(
             'id'      => 4,
+            'author'  => 4,
             'content' => 'Hello world!',
-            'author'  => 'quinn',
             'created' => '2016-04-13',
             'views'   => 0
         );
@@ -267,15 +277,15 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
         $data = array(
             array(
                 'id'      => 4,
+                'author'  => 4,
                 'content' => 'Hello world!',
-                'author'  => 'quinn',
                 'created' => '2016-04-13',
                 'views'   => 0
             ),
             array(
                 'id'      => 5,
+                'author'  => 5,
                 'content' => null,
-                'author'  => null,
                 'created' => null,
                 'views'   => null
             )
@@ -298,8 +308,8 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     {
         $data = array(
             'id'      => 1,
+            'author'  => 4,
             'content' => 'Hello world!',
-            'author'  => 'quinn',
             'created' => '2016-04-13',
             'views'   => 0
         );
@@ -394,7 +404,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
      */
     public function testThrowsExceptionWhenUpdateFiltersAreEmpty()
     {
-        $this->db->update('guestbook', array('author' => 'joey'), array());
+        $this->db->update('guestbook', array('author' => 1), array());
     }
 
     /**
@@ -492,10 +502,10 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
      * @covers \Shinjin\Pdo\Db::quote
      */
     public function testBuildsInsertQuery(){
-        $expected = 'INSERT INTO "guestbook" ("id","content","author","created") ' .
+        $expected = 'INSERT INTO "guestbook" ("id","author","content","created") ' .
                     'VALUES (?,?,?,?)';
 
-        $columns = array('id', 'content', 'author', 'created');
+        $columns = array('id', 'author', 'content', 'created');
         $actual = $this->db->buildInsertQuery('guestbook', $columns);
 
         $this->assertSame($expected, $actual);
