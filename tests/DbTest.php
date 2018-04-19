@@ -263,8 +263,8 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
             ),
             'query with join' => array(
                 'name',
-                array('guestbook as gb', 'author' => array('gb.id' => 'author.id')),
-                array('gb.id' => 1),
+                array('guestbook', 'author' => array('guestbook.id' => 'author.id')),
+                array('guestbook.id' => 1),
                 array(),
                 array(array('name' => 'joe'))
             ),

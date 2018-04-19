@@ -211,7 +211,7 @@ class Db
     {
         $statement = sprintf(
             'SELECT %s FROM %s',
-            implode(',', array_map(array($this, 'quote'), (array)$columns)),
+            implode(',', (array)$columns),
             $this->buildQueryTables((array)$tables)
         );
         $params = array();
@@ -221,7 +221,6 @@ class Db
         }
 
         if (!empty($order_columns)) {
-            $order_columns = array_map(array($this, 'quote'), $order_columns);
             $statement .= ' ORDER BY ' . implode(',', $order_columns);
         }
 
@@ -561,11 +560,6 @@ class Db
      */
     public function quote($value)
     {
-        if (strpos($value, ' ') !== false) {
-            $values = explode(' ', $value, 2);
-            return $this->quote($values[0]) . ' ' . $values[1];
-        }
-
         $d = $this->driver['quote_delimiter'];
         return $d . str_replace($d, $d.$d, $value) . $d;
     }
