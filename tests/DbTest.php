@@ -225,6 +225,53 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
     /**
+     * @covers \Shinjin\Pdo\Db::select
+     * @covers \Shinjin\Pdo\Db::query
+     * @covers \Shinjin\Pdo\Db::buildQueryFilter
+     * @covers \Shinjin\Pdo\Db::buildQueryTables
+     * @covers \Shinjin\Pdo\Db::quote
+     * @dataProvider selectReturnsCorrectResultDataProvider
+     */
+    public function testSelectReturnsCorrectResult(
+        $columns,
+        $tables,
+        $filters,
+        $order_columns,
+        $expected
+    ){
+        $sth = $this->db->select($columns, $tables, $filters, $order_columns);
+
+        $this->assertEquals($expected, $sth->fetchAll());
+    }
+
+    public function selectReturnsCorrectResultDataProvider()
+    {
+        return array(
+            'query with filter' => array(
+                'content',
+                'guestbook',
+                array('id' => 1),
+                array(),
+                array(array('content' => 'Hello buddy!'))
+            ),
+            'query with order column' => array(
+                'author',
+                'guestbook',
+                array(),
+                array('views', 'author DESC'),
+                array(array('author' => 3), array('author' => 2), array('author' => 1))
+            ),
+            'query with join' => array(
+                'name',
+                array('guestbook as gb', 'author' => array('gb.id' => 'author.id')),
+                array('gb.id' => 1),
+                array(),
+                array(array('name' => 'joe'))
+            ),
+        );
+    }
+
+    /**
      * @covers \Shinjin\Pdo\Db::query
      * @expectedException \Shinjin\Pdo\Exception\BadArgumentException
      */
@@ -603,6 +650,66 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
             ),
             'filter contains invalid value' => array(
                 array('id' => new \stdClass())
+            )
+        );
+    }
+
+    /**
+     * @covers \Shinjin\Pdo\Db::buildQueryTables
+     * @covers \Shinjin\Pdo\Db::quote
+     * @dataProvider testBuildQueryTablesWorksDataProvider
+     */
+    public function testBuildQueryTablesWorks($tables, $expected)
+    {
+        $actual = $this->db->buildQueryTables($tables);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testBuildQueryTablesWorksDataProvider()
+    {
+        return array(
+            'one table' => array(
+                array('guestbook'),
+                '"guestbook"'
+            ),
+            'multiple table' => array(
+                array(
+                    'guestbook',
+                    'author' => array('guestbook.id' => 'author.id')
+                ),
+                '"guestbook" INNER JOIN "author" ON ("guestbook"."id" = author.id)'
+            ),
+            'explicit join' => array(
+                array(
+                    'guestbook',
+                    'LEFT JOIN',
+                    'author' => array('guestbook.id' => 'author.id')
+                ),
+                '"guestbook" LEFT JOIN "author" ON ("guestbook"."id" = author.id)'
+            ),
+        );
+    }
+
+    /**
+     * @covers \Shinjin\Pdo\Db::buildQueryTables
+     * @expectedException \InvalidArgumentException
+     * @dataProvider testBuildQueryTablesThrowsExceptionDataProvider
+     */
+    public function testBuildQueryTablesThrowsExceptionWhenTablesAreInvalid(
+        $tables
+    ){
+        $this->db->buildQueryTables($tables);
+    }
+
+    public function testBuildQueryTablesThrowsExceptionDataProvider()
+    {
+        return array(
+            'join is invalid' => array(
+                array('guestbook', 'invalid')
+            ),
+            'value is invalid' => array(
+                array('guestbook', 'author' => new \stdClass())
             )
         );
     }

@@ -51,6 +51,18 @@ class Db
         )
     );
 
+    const JOINS = array(
+        'JOIN',
+        'INNER JOIN',
+        'FULL JOIN',
+        'FULL OUTER JOIN',
+        'LEFT JOIN',
+        'LEFT OUTER JOIN',
+        'RIGHT JOIN', 
+        'RIGHT OUTER JOIN',
+        'CROSS JOIN'
+    );
+
     /**
      * PDO object
      *
@@ -178,6 +190,42 @@ class Db
         $statement->execute((array)$params);
 
         return $statement;
+    }
+
+    /**
+     * Creates a SELECT query and executes it.
+     *
+     * @param string|array $columns       One or more columns to fetch
+     * @param string|array $tables        One or more tables to fetch from
+     * @param array        $filters       List of column/value pairs to filter
+     *                                    by in WHERE clause
+     * @param array        $order_columns List of columns to order the results
+     *
+     * @return \PDOStatement
+     */
+    public function select(
+        $columns,
+        $tables,
+        array $filters = array(),
+        array $order_columns = array())
+    {
+        $statement = sprintf(
+            'SELECT %s FROM %s',
+            implode(',', array_map(array($this, 'quote'), (array)$columns)),
+            $this->buildQueryTables((array)$tables)
+        );
+        $params = array();
+
+        if (!empty($filters)) {
+            $statement .= ' WHERE ' . $this->buildQueryFilter($filters, $params);
+        }
+
+        if (!empty($order_columns)) {
+            $order_columns = array_map(array($this, 'quote'), $order_columns);
+            $statement .= ' ORDER BY ' . implode(',', $order_columns);
+        }
+
+        return $this->query($statement, $params);
     }
 
     /**
@@ -394,7 +442,7 @@ class Db
      * @throws \Shinjin\Pdo\Exception\BadValueException
      * @throws \Shinjin\Pdo\Exception\BadFilterException
      */
-    public function buildQueryFilter(array $filters, array &$params = array())
+    public function buildQueryFilter(array $filters, array &$params = null)
     {
         $filter = '(';
 
@@ -429,9 +477,14 @@ class Db
                 $filter .= $this->quote($column) . ' ';
 
                 if (is_scalar($value)) {
-                    $filter .= $operator . ' ?';
-                    array_push($params, $value);
-                } elseif(is_array($value)) {
+                    $filter .= $operator . ' ';
+                    if ($params === null) {
+                        $filter .= $value;
+                    } else {
+                        $filter .= '?';
+                        array_push($params, $value);
+                    }
+                } elseif(is_array($value) && is_array($params)) {
                     $filter .= 'IN (' . str_repeat('?,', count($value) - 1) . '?)';
                     $params = array_merge($params, $value);
                 } else {
@@ -456,6 +509,50 @@ class Db
     }
 
     /**
+     * Constructs a string containing tables to query (e.g. the FROM part of the
+     * SELECT).
+     *
+     * @param array $tables List of tables and columns to join
+     *
+     * @return string Table string
+     * @throws \Shinjin\Pdo\Exception\BadValueException
+     */
+    public function buildQueryTables(array $tables)
+    {
+        $from = $this->quote(array_shift($tables));
+        $join = 'INNER JOIN';
+
+        foreach($tables as $table => $value) {
+            if (is_integer($table) && is_string($value)) {
+                if (in_array(strtoupper($value), self::JOINS)) {
+                    $join = strtoupper($value);
+                    continue;
+                } else {
+                    throw new BadValueException(
+                        "Value: $value is an invalid join type."
+                    );                    
+                }
+            }
+
+            $from .= sprintf(' %s ', $join);
+
+            if (!is_array($value)) {
+                throw new BadValueException('Value must be an array.');
+            }
+
+            $from .= sprintf(
+                '%s ON %s',
+                $this->quote($table),
+                $this->buildQueryFilter($value)
+            );
+
+            $join = 'INNER JOIN';
+        }
+
+        return $from;
+    }
+
+    /**
      * Quotes a table or column name.
      *
      * @param string $value Value to be quoted
@@ -464,6 +561,11 @@ class Db
      */
     public function quote($value)
     {
+        if (strpos($value, ' ') !== false) {
+            $values = explode(' ', $value, 2);
+            return $this->quote($values[0]) . ' ' . $values[1];
+        }
+
         $d = $this->driver['quote_delimiter'];
         return $d . str_replace($d, $d.$d, $value) . $d;
     }
