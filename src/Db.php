@@ -564,14 +564,14 @@ class Db
             if ($value === '*') {
                 return $value;
             } elseif (strpos($value, '.') !== false) {
-                list($qualifier, $column) = explode('.', $value);
-                return $this->quote($qualifier) . '.' . $this->quote($column);
+                $values = array_map(array($this, 'quote'), explode('.', $value));
+                return vsprintf('%s.%s', $values);
             } elseif (strpos($value, ' ') !== false) {
                 list($identifier, $suffix) = explode(' ', $value, 2);
-                return $this->quote($identifier) . ' ' . $suffix;
+                return sprintf('%s %s', $this->quote($identifier), $suffix);
             } else {
                 throw new BadValueException(
-                    "Value: $value is an invalid identifier."
+                    "\"$value\" is an invalid identifier."
                 );
             }
         }
