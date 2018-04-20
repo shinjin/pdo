@@ -51,6 +51,11 @@ class Db
         )
     );
 
+    /**
+     * List of supported joins
+     *
+     * @const array
+     */
     const JOINS = array(
         'JOIN',
         'INNER JOIN',
