@@ -211,7 +211,7 @@ class Db
     {
         $statement = sprintf(
             'SELECT %s FROM %s',
-            implode(',', (array)$columns),
+            implode(',', array_map(array($this, 'quote'), (array)$columns)),
             $this->buildQueryTables((array)$tables)
         );
         $params = array();
@@ -221,6 +221,7 @@ class Db
         }
 
         if (!empty($order_columns)) {
+            $order_columns = array_map(array($this, 'quote'), $order_columns);
             $statement .= ' ORDER BY ' . implode(',', $order_columns);
         }
 
@@ -429,8 +430,7 @@ class Db
     }
 
     /**
-     * Constructs a string containing column and placeholder pairs for a
-     * query's WHERE clause.
+     * Constructs a query's WHERE clause.
      *
      * @param array $filters List of column/value pairs to filter by in
      *                       WHERE clause
@@ -466,13 +466,6 @@ class Db
 
             if (is_string($column)) {
                 list($column, $operator) = array_pad(explode(' ', $column), 2, '=');
-
-                // if column contains qualifier, separate and quote it
-                if (strpos($column, '.') !== false) {
-                    list($qualifier, $column) = explode('.', $column);
-                    $filter .= $this->quote($qualifier) . '.';
-                }
-
                 $filter .= $this->quote($column) . ' ';
 
                 if (is_scalar($value)) {
@@ -508,8 +501,7 @@ class Db
     }
 
     /**
-     * Constructs a string containing tables to query (e.g. the FROM part of the
-     * SELECT).
+     * Constructs a select query's FROM clause.
      *
      * @param array $tables List of tables and columns to join
      *
@@ -529,18 +521,21 @@ class Db
                 } else {
                     throw new BadValueException(
                         "Value: $value is an invalid join type."
-                    );                    
+                    );                                    
                 }
             }
 
-            $from .= sprintf(' %s ', $join);
+            if (!is_string($table)) {
+                throw new BadValueException('Table name must be a string.');
+            }
 
             if (!is_array($value)) {
                 throw new BadValueException('Value must be an array.');
             }
 
             $from .= sprintf(
-                '%s ON %s',
+                ' %s %s ON %s',
+                $join,
                 $this->quote($table),
                 $this->buildQueryFilter($value)
             );
@@ -552,7 +547,7 @@ class Db
     }
 
     /**
-     * Quotes a table or column name.
+     * Quotes an identifier (e.g. column or table name)
      *
      * @param string $value Value to be quoted
      *
@@ -560,6 +555,22 @@ class Db
      */
     public function quote($value)
     {
+        if (!ctype_alnum(str_replace('_', '', $value))) {
+            if ($value === '*') {
+                return $value;
+            } elseif (strpos($value, '.') !== false) {
+                list($qualifier, $column) = explode('.', $value);
+                return $this->quote($qualifier) . '.' . $this->quote($column);
+            } elseif (strpos($value, ' ') !== false) {
+                list($identifier, $suffix) = explode(' ', $value, 2);
+                return $this->quote($identifier) . ' ' . $suffix;
+            } else {
+                throw new BadValueException(
+                    "Value: $value is an invalid identifier."
+                );
+            }
+        }
+
         $d = $this->driver['quote_delimiter'];
         return $d . str_replace($d, $d.$d, $value) . $d;
     }

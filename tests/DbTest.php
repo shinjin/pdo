@@ -193,7 +193,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * @covers \Shinjin\Pdo\Db::query
-     * @dataProvider queryReturnsPdoStatementHandleDataProvider
+     * @dataProvider testQueryReturnsPdoStatementHandleDataProvider
      */
     public function testQueryReturnsPdoStatementHandle($statement, $params)
     {
@@ -202,7 +202,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertInstanceOf('\\PDOStatement', $sth);
     }
 
-    public function queryReturnsPdoStatementHandleDataProvider()
+    public function testQueryReturnsPdoStatementHandleDataProvider()
     {
         return array(
             'query without params' => array(
@@ -230,7 +230,7 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
      * @covers \Shinjin\Pdo\Db::buildQueryFilter
      * @covers \Shinjin\Pdo\Db::buildQueryTables
      * @covers \Shinjin\Pdo\Db::quote
-     * @dataProvider selectReturnsCorrectResultDataProvider
+     * @dataProvider testSelectReturnsCorrectResultDataProvider
      */
     public function testSelectReturnsCorrectResult(
         $columns,
@@ -244,27 +244,27 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals($expected, $sth->fetchAll());
     }
 
-    public function selectReturnsCorrectResultDataProvider()
+    public function testSelectReturnsCorrectResultDataProvider()
     {
         return array(
-            'query with filter' => array(
+            'select with filter' => array(
                 'content',
                 'guestbook',
                 array('id' => 1),
                 array(),
                 array(array('content' => 'Hello buddy!'))
             ),
-            'query with order column' => array(
-                'author',
+            'select with order column' => array(
+                'id',
                 'guestbook',
                 array(),
-                array('views', 'author DESC'),
-                array(array('author' => 3), array('author' => 2), array('author' => 1))
+                array('id DESC'),
+                array(array('id' => 3), array('id' => 2), array('id' => 1))
             ),
-            'query with join' => array(
+            'select with join' => array(
                 'name',
-                array('guestbook', 'author' => array('guestbook.id' => 'author.id')),
-                array('guestbook.id' => 1),
+                array('guestbook as gb', 'author' => array('gb.id' => 'author.id')),
+                array('gb.id' => 1),
                 array(),
                 array(array('name' => 'joe'))
             ),
@@ -673,14 +673,14 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
                 array('guestbook'),
                 '"guestbook"'
             ),
-            'multiple table' => array(
+            'multiple tables' => array(
                 array(
                     'guestbook',
                     'author' => array('guestbook.id' => 'author.id')
                 ),
                 '"guestbook" INNER JOIN "author" ON ("guestbook"."id" = author.id)'
             ),
-            'explicit join' => array(
+            'table with explicit join' => array(
                 array(
                     'guestbook',
                     'LEFT JOIN',
@@ -708,10 +708,52 @@ class DbTest extends \PHPUnit_Extensions_Database_TestCase
             'join is invalid' => array(
                 array('guestbook', 'invalid')
             ),
+            'table is invalid' => array(
+                array('guestbook', array())
+            ),
             'value is invalid' => array(
                 array('guestbook', 'author' => new \stdClass())
             )
         );
     }
 
+    /**
+     * @covers \Shinjin\Pdo\Db::quote
+     * @dataProvider testQuoteIdentifierWorksDataProvider
+     */
+    public function testQuoteIdentifierWorks($identifier, $expected){
+        $actual = $this->db->quote($identifier);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testQuoteIdentifierWorksDataProvider()
+    {
+        return array(
+            'standard identifier' => array(
+                'standard',
+                '"standard"'
+            ),
+            'wildcard identifier' => array(
+                '*',
+                '*'
+            ),
+            'identifier with qualifier' => array(
+                'table.id',
+                '"table"."id"'
+            ),
+            'identifier with alias' => array(
+                'table as t',
+                '"table" as t'
+            ),
+        );
+    }
+
+    /**
+     * @covers \Shinjin\Pdo\Db::quote
+     * @expectedException \Shinjin\Pdo\Exception\BadValueException
+     */
+    public function testQuoteThrowsExceptionWhenIdentifierIsInvalid(){
+        $this->db->quote('COUNT(*)');
+    }
 }
