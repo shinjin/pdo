@@ -525,7 +525,7 @@ class Db
                     continue;
                 } else {
                     throw new BadValueException(
-                        "Value: $value is an invalid join type."
+                        "\"$value\" is an unsupported join type."
                     );                                    
                 }
             }
@@ -571,7 +571,7 @@ class Db
                 return sprintf('%s %s', $this->quote($identifier), $suffix);
             } else {
                 throw new BadValueException(
-                    "\"$value\" is an invalid identifier."
+                    "\"$value\" is an unsupported identifier."
                 );
             }
         }
