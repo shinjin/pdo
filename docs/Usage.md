@@ -26,15 +26,31 @@ $connection_parameters = array(
 $db = new Db($connection_parameters);
 ```
 ## Querying
-Fetch records using the **query** method. A successful query returns a PDOStatement object.
+Fetch records using the **select** method. A successful select returns a PDOStatement object.
 ``` php
-$statement  = 'SELECT author FROM guestbook WHERE id = ?';
-$parameters = array(1);
+$columns = 'content';
+$tables  = 'guestbook';
+$filters = array();
+$order_columns = array('id');
 
-$sth = $db->query($statement, $parameters);
+$sth = $db->select($columns, $tables, $filters, $order_columns);
 
 // apply any PDOStatement method to extract the results
 $result = $sth->fetchAll();
+```
+
+Join multiple tables in the select by providing an array of tables. After the first table, a list of columns to join on must be specified.
+``` php
+$columns = 'content';
+$tables  = array(
+    'guestbook as gb', // first value is the base table name
+    'inner join' // join type; if omitted default is "inner join"
+    'author' => array(
+        'gb.id' => 'author.id' // column(s) to join on
+    )
+);
+
+$sth = $db->select($columns, $tables);
 ```
 
 Insert new records using the **insert** method.
@@ -217,4 +233,3 @@ $db->beginTransaction();
 $db->commit(); // second transaction
 $db->commit(); // first transaction
 ```
-
